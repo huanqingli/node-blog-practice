@@ -6,7 +6,7 @@ module.exports = {
     session: {
         secret: 'poorlyBlog',
         key: 'poorlyBlog',
-        maxAge: 2592000000
+        maxAge: null
     },
     mongodb: 'mongodb://localhost:27017/poorly_blog'
 };

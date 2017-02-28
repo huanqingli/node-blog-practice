@@ -17,7 +17,13 @@ router.post('/', function(req, res, next) {
     var name = req.body.name;
     var password = req.body.password;
 
-    userModel.getUserByName(name);
+    var checkLogin = function (docs) {
+        if(docs==null){
+            return res.redirect('/signin?error=找不到该用户')
+        }
+    };
+
+    userModel.getUserByName(name, checkLogin);
         // .then(function (user) {
         //     if (!user) {
         //         req.flash('error', '用户不存在');
