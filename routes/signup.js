@@ -1,6 +1,7 @@
 /**
  * Created by Muc on 17/2/21.
  */
+var fs = require('fs');
 var express = require('express');
 var router = express.Router();
 var sha1 = require('sha1');
@@ -26,6 +27,9 @@ var upload = multer({ storage: storage }); //文件上传目录
 // GET /signup 注册页
 router.get('/',  function(req, res, next) {
     res.render('signup');
+    delete req.session.error;
+    delete req.session.success;
+    req.session.save();
 });
 
 // POST /signup 用户注册
@@ -49,9 +53,9 @@ router.post('/', upload.single("avatar"), function(req, res, next) {
     } catch (err) {
         console.log(err);
         // 注册失败，异步删除上传的头像
-        // fs.unlink(req.files.avatar.path);
-        // req.flash('error', e.message);
-        return res.redirect('/signup?error='+err);
+        // fs.unlink(avatar);
+        req.session.error = err;
+        return res.redirect('/signup');
     }
 
     // 明文密码加密
@@ -64,7 +68,19 @@ router.post('/', upload.single("avatar"), function(req, res, next) {
         avatar: avatar
     };
 
-    userModel.create(user);
+    var checkUser = function (docs) {
+        if(docs==null){
+            userModel.create(user);
+            return res.redirect('/post');
+        } else{
+            fs.unlink(avatar);
+            req.session.error = '用户名已被占用';
+            return res.redirect('/signup');
+        }
+    };
+
+    userModel.getUserByName(name, checkUser);
+
 });
 
 module.exports = router;
