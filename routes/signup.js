@@ -68,10 +68,19 @@ router.post('/', upload.single("avatar"), function(req, res, next) {
         avatar: avatar
     };
 
+    var autoLogin = function (result) {
+        // 此 user 是插入 mongodb 后的值，包含 _id
+        user = result.ops[0];
+        // 用户信息写入 session
+        delete user.password;
+        req.session.user = user;
+        // 跳转到主页
+        res.redirect('/posts');
+    };
+
     var checkUser = function (docs) {
         if(docs==null){
-            userModel.create(user);
-            return res.redirect('/post');
+            userModel.create(user, autoLogin);
         } else{
             fs.unlink(avatar);
             req.session.error = '用户名已被占用';

@@ -44,7 +44,7 @@ app.locals.blog = {
 };
 // 添加模板必需的三个变量
 app.use(function (req, res, next) {
-    res.locals.user = "";
+    res.locals.user = req.session.user||"";
     res.locals.success =  req.session.success||"";
     res.locals.error = req.session.error||"";
     next();
