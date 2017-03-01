@@ -6,9 +6,10 @@ var router = express.Router();
 var sha1 = require('sha1');
 
 var userModel = require('../models/users');
+var checkNotLogin = require('../middlewares/check').checkNotLogin;
 
 // GET /signin 登录页
-router.get('/',  function(req, res, next) {
+router.get('/', checkNotLogin, function(req, res, next) {
     res.render('signin');
     delete req.session.error;
     delete req.session.success;
@@ -16,7 +17,7 @@ router.get('/',  function(req, res, next) {
 });
 
 // POST /signin 用户登录
-router.post('/', function(req, res, next) {
+router.post('/', checkNotLogin, function(req, res, next) {
     var name = req.body.name;
     var password = req.body.password;
 

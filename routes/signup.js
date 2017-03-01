@@ -7,6 +7,8 @@ var router = express.Router();
 var sha1 = require('sha1');
 
 var userModel = require('../models/users');
+var checkNotLogin = require('../middlewares/check').checkNotLogin;
+
 
 //对 multipart/form-data 形式上传的文件进行处理
 var multer  = require('multer');
@@ -25,7 +27,7 @@ var upload = multer({ storage: storage }); //文件上传目录
 
 
 // GET /signup 注册页
-router.get('/',  function(req, res, next) {
+router.get('/', checkNotLogin, function(req, res, next) {
     res.render('signup');
     delete req.session.error;
     delete req.session.success;
@@ -33,11 +35,11 @@ router.get('/',  function(req, res, next) {
 });
 
 // POST /signup 用户注册
-router.post('/', upload.single("avatar"), function(req, res, next) {
+router.post('/', checkNotLogin, upload.single("avatar"), function(req, res, next) {
     var name = req.body.name;
     var password = req.body.password;
     var repassword = req.body.repassword;
-    var avatar = req.file&&req.file.path;
+    var avatar = req.file&&req.file.filename;
 
     // 校验参数
     try {

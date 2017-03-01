@@ -1,11 +1,11 @@
 <%- include('header') %>
 
 <div>
-    <div class="four wide column">
+    <div>
         <a href="/posts?author=<%= user._id %>"
            data-title="<%= user.name %>"
            data-content="<%= user.bio %>">
-            <img class="avatar" src="/<%= user.avatar %>">
+            <img style="width: 100px" src="/img/<%= user.avatar %>">
         </a>
     </div>
 
