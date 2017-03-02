@@ -43,7 +43,7 @@ var findOneDoc =function(db, condition, collections, callback) {
     // Get the documents collection
     var collection = db.collection(collections);
     // Find some documents
-    collection.findOne(condition,function(err, docs) {
+    collection.findOne(condition, function(err, docs) {
         if(err==null){
             console.log("Found 1 doc");
             console.log(docs);
@@ -53,12 +53,13 @@ var findOneDoc =function(db, condition, collections, callback) {
         if(callback)callback(docs);
     });
 };
-//产找全部符合条件的文件
+//查找全部符合条件的文件
 var findAllDocs =function(db, condition, collections, callback) {
     // Get the documents collection
     var collection = db.collection(collections);
     // Find some documents
-    collection.find(condition).toArray(function(err, docs) {
+    collection.find(condition).sort({"_id":-1}).toArray(function(err, docs) {
+        //sort({"_id":-1}) 按时间降序排列
         if(err==null){
             console.log("Found the following docs");
             console.log(docs);

@@ -14,6 +14,6 @@ module.exports={
         if (author) {
             query.author = author;
         }
-        connect(query, findArticles, 'article', callback)
+        connect(query, findArticles, 'articles', callback)
     },
 };

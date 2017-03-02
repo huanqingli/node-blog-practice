@@ -4,6 +4,7 @@
 var express = require('express');
 var router = express.Router();
 
+var userModel = require('../models/users');
 var PostModel = require('../models/posts');
 var checkLogin = require('../middlewares/check').checkLogin;
 
@@ -13,11 +14,21 @@ var checkLogin = require('../middlewares/check').checkLogin;
 router.get('/', function(req, res, next) {
     var author = req.query.author;
 
+    var flag = 0;
+
     var renderPage = function (articles) {
-        res.render('posts', {posts: articles});
-        delete req.session.error;
-        delete req.session.success;
-        req.session.save();
+        articles.forEach(function (article, index) {
+            userModel.getUserById(articles[index].author, function (author) {
+                articles[index].author = author;
+                flag += 1;
+                if (flag == articles.length){
+                    res.render('posts', {posts: articles});
+                    delete req.session.error;
+                    delete req.session.success;
+                    req.session.save();
+                }
+            });
+        });
     };
     PostModel.getPosts(author, renderPage);
 
