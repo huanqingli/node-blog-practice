@@ -46,7 +46,7 @@ var findOneDoc =function(db, condition, collections, callback) {
     collection.findOne(condition, function(err, doc) {
         if(err==null){
             console.log("Found 1 doc");
-            console.log(doc);
+            // console.log(doc);
         }else{
             console.log(err);
         }
@@ -62,7 +62,7 @@ var findAllDocs =function(db, condition, collections, callback) {
         //sort({"_id":-1}) 按时间降序排列
         if(err==null){
             console.log("Found the following docs");
-            console.log(docs);
+            // console.log(docs);
         }else{
             console.log(err);
         }
@@ -73,7 +73,7 @@ var findAllDocs =function(db, condition, collections, callback) {
 var updateDoc = function(db, condition, collections, callback) {
     // Get the documents collection
     var collection = db.collection(collections);
-    // Update document where a is 2, set b equal to 1
+    // Update document
     collection.updateOne(condition[0]
         , condition[1], function(err, result) {
             if(err==null){
@@ -85,10 +85,26 @@ var updateDoc = function(db, condition, collections, callback) {
             if(callback)callback(result);
         });
 };
+//删除一个文件
+var deleteDoc = function (db, condition, collections, callback) {
+    // Get the documents collection
+    var collection = db.collection(collections);
+    // Delete document
+    collection.deleteOne(condition, function(err, result) {
+        if(err==null){
+            console.log("Removed the doc");
+            // console.log(result);
+        }else{
+            console.log(err);
+        }
+        if(callback)callback(result);
+    });
+};
 module.exports = {
     connect:connect,
     insertDocs:insertDocs,
     findOneDoc:findOneDoc,
     findAllDocs:findAllDocs,
     updateDoc:updateDoc,
+    deleteDoc:deleteDoc,
 };

@@ -8,6 +8,8 @@ var insertArticles = require('./index').insertDocs;
 var findArticles = require('./index').findAllDocs;
 var findArticle = require('./index').findOneDoc;
 var addPV = require('./index').updateDoc;
+var updateArticle = require('./index').updateDoc;
+var delPost = require('./index').deleteDoc;
 
 module.exports={
     create:function(article, callback=null){
@@ -26,4 +28,11 @@ module.exports={
     incPv: function incPv(id, callback=null) {
         connect([{ _id:ObjectID(id)}, { $inc: { pv: 1 } }], addPV, 'articles', callback);
     },
+    delPostById:function (id, author, callback=null) {
+        connect({_id:ObjectID(id),author:author}, delPost, 'articles', callback)
+    },
+    updatePostById:function (id, author,query,  callback=null) {
+        connect([{ _id:ObjectID(id),author:author}, { $set: query }], updateArticle, 'articles', callback);
+    }
+
 };
