@@ -43,14 +43,14 @@ var findOneDoc =function(db, condition, collections, callback) {
     // Get the documents collection
     var collection = db.collection(collections);
     // Find some documents
-    collection.findOne(condition, function(err, docs) {
+    collection.findOne(condition, function(err, doc) {
         if(err==null){
             console.log("Found 1 doc");
-            console.log(docs);
+            console.log(doc);
         }else{
             console.log(err);
         }
-        if(callback)callback(docs);
+        if(callback)callback(doc);
     });
 };
 //查找全部符合条件的文件
@@ -69,10 +69,26 @@ var findAllDocs =function(db, condition, collections, callback) {
         if(callback)callback(docs);
     });
 };
-
+//更新一个文件
+var updateDoc = function(db, condition, collections, callback) {
+    // Get the documents collection
+    var collection = db.collection(collections);
+    // Update document where a is 2, set b equal to 1
+    collection.updateOne(condition[0]
+        , condition[1], function(err, result) {
+            if(err==null){
+                console.log("Updated the doc");
+                // console.log(result);
+            }else{
+                console.log(err);
+            }
+            if(callback)callback(result);
+        });
+};
 module.exports = {
     connect:connect,
     insertDocs:insertDocs,
     findOneDoc:findOneDoc,
     findAllDocs:findAllDocs,
+    updateDoc:updateDoc,
 };

@@ -6,6 +6,7 @@ var router = express.Router();
 
 var userModel = require('../models/users');
 var PostModel = require('../models/posts');
+var CommentModel = require('../models/comments');
 var checkLogin = require('../middlewares/check').checkLogin;
 
 
@@ -43,7 +44,7 @@ router.get('/create',checkLogin, function(req, res, next) {
 });
 
 // POST /posts 发表一篇文章
-router.post('/', checkLogin, function(req, res, next) {
+router.post('/create', checkLogin, function(req, res, next) {
     var author = req.session.user._id;
     var title = req.body.title;
     var content = req.body.content;
@@ -78,4 +79,88 @@ router.post('/', checkLogin, function(req, res, next) {
 
     PostModel.create(article, afterPost)
 });
+
+// GET /posts/:postId 单独一篇的文章页
+router.get('/:postId', function(req, res, next) {
+    var postId = req.params.postId;
+
+    var showArticle = async function () {
+        await new Promise(function (resolve, reject) {
+            PostModel.incPv(postId, function (result) {
+                resolve(result);
+            });
+        });// pv 加 1
+        var post = await new Promise(function (resolve, reject) {
+            PostModel.getPostById(postId, function (article) {
+                resolve(article);
+            });
+        });// 获取文章信息
+        await new Promise(function (resolve, reject) {
+            userModel.getUserById(post.author,function (author) {
+                post.author=author;
+                resolve();
+            })
+        });//获取文章作者
+        var comments = await new Promise(function (resolve, reject) {
+            CommentModel.getComments(post._id, function (comment) {
+                resolve(comment);
+            });
+        });// 获取该文章所有留言
+        for(var i=0;i<comments.length;i++){
+            await new Promise(function (resolve, reject) {
+                userModel.getUserById(comments[i].author,function (author) {
+                    comments[i].author=author;
+                    resolve();
+                })
+            });//获取文章留言作者
+        }
+        if (!post) {
+            req.session.error = '该文章不存在';
+            return res.redirect('/post');
+        }
+        res.render('post',{post: post, comments: comments});
+        delete req.session.error;
+        delete req.session.success;
+        req.session.save();
+    };
+
+    showArticle();
+
+        // .then(function (result) {
+        //     var post = result[0];
+        //     var comments = result[1];
+        //     if (!post) {
+        //         throw new Error('该文章不存在');
+        //     }
+        //
+        //     res.render('post', {
+        //         post: post,
+        //         comments: comments
+        //     });
+        // })
+        // .catch(next);
+    //{post: post, comments: comments}
+});
+
+// POST /posts/:postId/comment 创建一条留言
+router.post('/:postId/comment', checkLogin, function(req, res, next) {
+    var author = req.session.user._id;
+    var postId = req.params.postId;
+    var content = req.body.content;
+    var comment = {
+        author: author,
+        postId: postId,
+        content: content
+    };
+
+    var afterComment = function (result) {
+        req.session.success = '留言成功';
+        // 留言成功后跳转到上一页
+        res.redirect('back');
+    };
+
+    CommentModel.create(comment, afterComment);
+
+});
+
 module.exports = router;
